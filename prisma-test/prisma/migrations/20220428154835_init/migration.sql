@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "MenuItem" ALTER COLUMN "src" SET DATA TYPE VARCHAR;

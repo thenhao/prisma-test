@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOWDATABASE_URL")
+}
+
+model User {
+  Id Int @id
+
+  username String @db.VarChar(20)
+
+  password String @db.VarChar(20)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+
+}
+
+model DistinctOrderList {
+  orderNo        Int              @id
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+
+  ComputedOrders ComputedOrders[]
+
+  Receipt        Receipt[]
+}
+
+model MenuItem {
+
+  menuItemNo Int @id @default(autoincrement())
+
+  src String @db.VarChar
+
+  alt String @db.VarChar(50)
+
+  type String @db.VarChar(20)
+
+  category String @db.VarChar(20)
+
+  chefRecommendation Boolean
+
+  price Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+  
+  ComputedOrders ComputedOrders[]
+}
+
+model ComputedOrders {
+
+  Id Int @id @default(autoincrement())
+
+  orderNo DistinctOrderList @relation(fields: [orderID], references: [orderNo])
+
+  orderID Int
+
+  menuItemNo MenuItem @relation(fields: [menuItemID], references: [menuItemNo])
+
+  menuItemID Int
+
+  quantity Int
+
+  totalItemPrice Int
+
+  tableNo Int
+
+  orderStatus String @db.VarChar(50)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+}
+
+model Receipt {
+
+  receiptId Int @id @default(autoincrement())
+
+  orderNo DistinctOrderList @relation(fields: [orderID], references: [orderNo]) 
+
+  orderID Int @unique
+
+  totalPrice Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+
+  PaymentInvoice PaymentInvoice[]
+}
+
+model PaymentInvoice {
+
+  invoiceId Int @id @default(autoincrement())
+
+  receiptId Receipt @relation(fields: [receiptNo], references: [receiptId])
+
+  receiptNo Int
+
+  paymentType String @db.VarChar(20)
+
+  paymentStatus String @db.VarChar(20)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime? @updatedAt
+}
